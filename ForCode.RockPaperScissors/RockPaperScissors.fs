@@ -1,44 +1,62 @@
 ﻿namespace ForCode.RockPaperScissors
 
 module RockPaperScissorsResolver =
-    type Hand =
+    type HandType =
         | None = 0
         | Scissors = 1
         | Rock = 2
         | Paper = 3
-    
+        
+    type Hand(handType : HandType) =
+        member x.Type = handType
+
+        abstract ShootVs : Hand -> Hand
+        default this.ShootVs (hand : Hand) =
+                failwith "Invalid hand"
+        
+    type Scissors() =
+        inherit Hand(HandType.Scissors)
+
+        override this.ShootVs (hand : Hand) =
+            match hand.Type with
+            | HandType.Paper ->
+                this :> Hand
+            | HandType.Rock ->
+                hand
+            | HandType.Scissors ->
+                Hand(HandType.None)
+            | _ ->
+                base.ShootVs hand
+
+    type Paper() =
+        inherit Hand(HandType.Paper)
+
+        override this.ShootVs (hand : Hand) =
+            match hand.Type with
+            | HandType.Rock ->
+                this :> Hand
+            | HandType.Scissors ->
+                hand
+            | HandType.Paper ->
+                Hand(HandType.None)
+            | _ ->
+                base.ShootVs hand
+
+    type Rock() =
+        inherit Hand(HandType.Rock)
+
+        override this.ShootVs (hand : Hand) =
+            match hand.Type with
+            | HandType.Scissors ->
+                this :> Hand
+            | HandType.Paper ->
+                hand
+            | HandType.Rock ->
+                Hand(HandType.None)
+            | _ ->
+                base.ShootVs hand
+
     let GetWinner 
         (left : Hand)
         (right : Hand) =
-
-        if left.Equals(Hand.None)
-            || right.Equals(Hand.None) then
-            failwith "Invalid hand"
-        
-        match left with
-        | Hand.Scissors ->
-            match right with
-            | Hand.Paper ->
-                left
-            | Hand.Rock ->
-                right
-            | _ ->           
-                Hand.None
-        | Hand.Paper ->
-            match right with
-            | Hand.Rock ->
-                left
-            | Hand.Scissors ->
-                right
-            | _ ->           
-                Hand.None
-        | Hand.Rock ->
-            match right with
-            | Hand.Scissors ->
-                left
-            | Hand.Paper ->
-                right
-            | _ ->           
-                Hand.None
-        | _ ->           
-            failwith "Invalid hand"
+        left.ShootVs right                
