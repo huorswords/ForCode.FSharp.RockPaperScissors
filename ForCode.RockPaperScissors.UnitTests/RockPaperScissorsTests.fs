@@ -7,17 +7,32 @@ open Xunit.Extensions
 module RockPaperScissorsTests = 
     open ForCode.RockPaperScissors.RockPaperScissorsResolver
 
-    let TestData = [| 
+    let TestData = [|
            [| Scissors() :> Hand; Paper()    :> Hand; Scissors()          :> Hand |]
            [| Paper()    :> Hand; Scissors() :> Hand; Scissors()          :> Hand |]
-           [| Scissors() :> Hand; Paper()    :> Hand; Scissors()          :> Hand |] 
-           [| Scissors() :> Hand; Rock()     :> Hand; Rock()              :> Hand |] 
-           [| Rock()     :> Hand; Scissors() :> Hand; Rock()              :> Hand |] 
-           [| Paper()    :> Hand; Rock()     :> Hand; Paper()             :> Hand |] 
-           [| Rock()     :> Hand; Paper()    :> Hand; Paper()             :> Hand |] 
-           [| Scissors() :> Hand; Scissors() :> Hand; Hand(HandType.None)         |] 
-           [| Rock()     :> Hand; Rock()     :> Hand; Hand(HandType.None)         |] 
+           [| Scissors() :> Hand; Paper()    :> Hand; Scissors()          :> Hand |]
+           [| Scissors() :> Hand; Rock()     :> Hand; Rock()              :> Hand |]
+           [| Rock()     :> Hand; Scissors() :> Hand; Rock()              :> Hand |]
+           [| Paper()    :> Hand; Rock()     :> Hand; Paper()             :> Hand |]
+           [| Rock()     :> Hand; Paper()    :> Hand; Paper()             :> Hand |]
+           [| Paper()    :> Hand; Lizard()   :> Hand; Lizard()            :> Hand |]
+           [| Paper()    :> Hand; Spock()    :> Hand; Paper()             :> Hand |]
+           [| Scissors() :> Hand; Lizard()   :> Hand; Scissors()          :> Hand |]
+           [| Scissors() :> Hand; Spock()    :> Hand; Spock()             :> Hand |]
+           [| Rock()     :> Hand; Lizard()   :> Hand; Rock()              :> Hand |]
+           [| Rock()     :> Hand; Spock()    :> Hand; Spock()             :> Hand |]
+           [| Lizard()   :> Hand; Paper()    :> Hand; Lizard()            :> Hand |]
+           [| Spock()    :> Hand; Paper()    :> Hand; Paper()             :> Hand |]
+           [| Lizard()   :> Hand; Scissors() :> Hand; Scissors()          :> Hand |]
+           [| Spock()    :> Hand; Scissors() :> Hand; Spock()             :> Hand |]
+           [| Lizard()   :> Hand; Rock()     :> Hand; Rock()              :> Hand |]
+           [| Spock()    :> Hand; Rock()     :> Hand; Spock()             :> Hand |]
+
+           [| Scissors() :> Hand; Scissors() :> Hand; Hand(HandType.None)         |]
+           [| Rock()     :> Hand; Rock()     :> Hand; Hand(HandType.None)         |]
            [| Paper()    :> Hand; Paper()    :> Hand; Hand(HandType.None)         |]
+           [| Lizard()   :> Hand; Lizard()   :> Hand; Hand(HandType.None)         |]
+           [| Spock()    :> Hand; Spock()    :> Hand; Hand(HandType.None)         |]
         |] 
 
     let WrongData = [|
@@ -27,10 +42,10 @@ module RockPaperScissorsTests =
         |]
 
     [<Theory>]
-    [<MemberData("TestData")>]   
+    [<MemberData("TestData")>]
     let WinnerIsCorrect
         (left : Hand)
-        (right : Hand) 
+        (right : Hand)
         (expected : Hand) =
         let actual = GetWinner left right
         let expected = expected

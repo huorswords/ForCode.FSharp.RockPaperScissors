@@ -6,6 +6,8 @@ module RockPaperScissorsResolver =
         | Scissors = 1
         | Rock = 2
         | Paper = 3
+        | Lizard = 4
+        | Spock = 5
         
     type Hand(handType : HandType) =
         member x.Type = handType
@@ -25,6 +27,10 @@ module RockPaperScissorsResolver =
                 hand
             | HandType.Scissors ->
                 Hand(HandType.None)
+            | HandType.Lizard ->
+                this :> Hand
+            | HandType.Spock ->
+                hand
             | _ ->
                 base.ShootVs hand
 
@@ -39,6 +45,10 @@ module RockPaperScissorsResolver =
                 hand
             | HandType.Paper ->
                 Hand(HandType.None)
+            | HandType.Lizard ->
+                hand
+            | HandType.Spock ->
+                this :> Hand
             | _ ->
                 base.ShootVs hand
 
@@ -52,6 +62,46 @@ module RockPaperScissorsResolver =
             | HandType.Paper ->
                 hand
             | HandType.Rock ->
+                Hand(HandType.None)
+            | HandType.Lizard ->
+                this :> Hand
+            | HandType.Spock ->
+                hand
+            | _ ->
+                base.ShootVs hand
+                
+    type Lizard() =
+        inherit Hand(HandType.Lizard)
+
+        override this.ShootVs (hand : Hand) =
+            match hand.Type with
+            | HandType.Scissors ->
+                hand
+            | HandType.Paper ->
+                this :> Hand
+            | HandType.Rock ->
+                hand
+            | HandType.Lizard ->
+                Hand(HandType.None)
+            | HandType.Spock ->
+                this :> Hand
+            | _ ->
+                base.ShootVs hand
+                
+    type Spock() =
+        inherit Hand(HandType.Spock)
+
+        override this.ShootVs (hand : Hand) =
+            match hand.Type with
+            | HandType.Scissors ->
+                this :> Hand
+            | HandType.Paper ->
+                hand
+            | HandType.Rock ->
+                this :> Hand
+            | HandType.Lizard ->
+                hand
+            | HandType.Spock ->
                 Hand(HandType.None)
             | _ ->
                 base.ShootVs hand
