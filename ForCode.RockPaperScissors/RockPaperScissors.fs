@@ -1,44 +1,56 @@
 ﻿namespace ForCode.RockPaperScissors
 
 module RockPaperScissorsResolver =
-    type Hand =
-        | None = 0
+
+    type HandType =
         | Scissors = 1
         | Rock = 2
         | Paper = 3
-    
-    let GetWinner 
-        (left : Hand)
-        (right : Hand) =
+        | Lizard = 4
+        | Spock = 5
 
-        if left.Equals(Hand.None)
-            || right.Equals(Hand.None) then
-            failwith "Invalid hand"
+    type GameResult =
+        | Deuce = 1
+        | Win   = 2
+        | Lose  = 3
+
+    type Shape(hand : HandType, loseWith : HandType[]) =
+        member x.Hand = hand
+        member x.LoseWith = loseWith
         
-        match left with
-        | Hand.Scissors ->
-            match right with
-            | Hand.Paper ->
-                left
-            | Hand.Rock ->
-                right
-            | _ ->           
-                Hand.None
-        | Hand.Paper ->
-            match right with
-            | Hand.Rock ->
-                left
-            | Hand.Scissors ->
-                right
-            | _ ->           
-                Hand.None
-        | Hand.Rock ->
-            match right with
-            | Hand.Scissors ->
-                left
-            | Hand.Paper ->
-                right
-            | _ ->           
-                Hand.None
-        | _ ->           
-            failwith "Invalid hand"
+        member this.Play(versus : Shape) : GameResult =
+            if versus.Hand.Equals(hand) then
+                GameResult.Deuce
+            else
+                try
+                    let found = Array.find<HandType>(fun elem -> elem.Equals(versus.Hand)) this.LoseWith
+                    GameResult.Lose
+                with
+                    | :? System.Collections.Generic.KeyNotFoundException -> GameResult.Win
+             
+    [<AbstractClass; Sealed>]
+    type HandFactory private() =
+        static member Paper() =
+            Shape(HandType.Paper, [| HandType.Lizard; HandType.Scissors |])
+        static member Rock() =
+            Shape(HandType.Rock, [| HandType.Paper; HandType.Spock |])
+        static member Scissors() =
+            Shape(HandType.Scissors, [| HandType.Rock; HandType.Spock |])
+        static member Lizard() =
+            Shape(HandType.Lizard, [| HandType.Rock; HandType.Scissors |])
+        static member Spock() =
+            Shape(HandType.Spock, [| HandType.Lizard; HandType.Paper |])
+        static member Create(handType: HandType) =
+            match handType with
+            | HandType.Spock -> 
+                HandFactory.Spock()
+            | HandType.Paper -> 
+                HandFactory.Paper()
+            | HandType.Scissors -> 
+                HandFactory.Scissors()
+            | HandType.Rock -> 
+                HandFactory.Rock()
+            | HandType.Lizard-> 
+                HandFactory.Lizard()
+            | _ ->
+                failwith "Invalid hand"
