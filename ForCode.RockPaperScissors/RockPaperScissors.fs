@@ -1,112 +1,56 @@
 ﻿namespace ForCode.RockPaperScissors
 
 module RockPaperScissorsResolver =
+
     type HandType =
-        | None = 0
         | Scissors = 1
         | Rock = 2
         | Paper = 3
         | Lizard = 4
         | Spock = 5
-        
-    type Hand(handType : HandType) =
-        member x.Type = handType
 
-        abstract ShootVs : Hand -> Hand
-        default this.ShootVs (hand : Hand) =
+    type GameResult =
+        | Deuce = 1
+        | Win   = 2
+        | Lose  = 3
+
+    type Shape(hand : HandType, loseWith : HandType[]) =
+        member x.Hand = hand
+        member x.LoseWith = loseWith
+        
+        member this.Play(versus : Shape) : GameResult =
+            if versus.Hand.Equals(hand) then
+                GameResult.Deuce
+            else
+                try
+                    let found = Array.find<HandType>(fun elem -> elem.Equals(versus.Hand)) this.LoseWith
+                    GameResult.Lose
+                with
+                    | :? System.Collections.Generic.KeyNotFoundException -> GameResult.Win
+             
+    [<AbstractClass; Sealed>]
+    type HandFactory private() =
+        static member Paper() =
+            Shape(HandType.Paper, [| HandType.Lizard; HandType.Scissors |])
+        static member Rock() =
+            Shape(HandType.Rock, [| HandType.Paper; HandType.Spock |])
+        static member Scissors() =
+            Shape(HandType.Scissors, [| HandType.Rock; HandType.Spock |])
+        static member Lizard() =
+            Shape(HandType.Lizard, [| HandType.Rock; HandType.Scissors |])
+        static member Spock() =
+            Shape(HandType.Spock, [| HandType.Lizard; HandType.Paper |])
+        static member Create(handType: HandType) =
+            match handType with
+            | HandType.Spock -> 
+                HandFactory.Spock()
+            | HandType.Paper -> 
+                HandFactory.Paper()
+            | HandType.Scissors -> 
+                HandFactory.Scissors()
+            | HandType.Rock -> 
+                HandFactory.Rock()
+            | HandType.Lizard-> 
+                HandFactory.Lizard()
+            | _ ->
                 failwith "Invalid hand"
-        
-    type Scissors() =
-        inherit Hand(HandType.Scissors)
-
-        override this.ShootVs (hand : Hand) =
-            match hand.Type with
-            | HandType.Paper ->
-                this :> Hand
-            | HandType.Rock ->
-                hand
-            | HandType.Scissors ->
-                Hand(HandType.None)
-            | HandType.Lizard ->
-                this :> Hand
-            | HandType.Spock ->
-                hand
-            | _ ->
-                base.ShootVs hand
-
-    type Paper() =
-        inherit Hand(HandType.Paper)
-
-        override this.ShootVs (hand : Hand) =
-            match hand.Type with
-            | HandType.Rock ->
-                this :> Hand
-            | HandType.Scissors ->
-                hand
-            | HandType.Paper ->
-                Hand(HandType.None)
-            | HandType.Lizard ->
-                hand
-            | HandType.Spock ->
-                this :> Hand
-            | _ ->
-                base.ShootVs hand
-
-    type Rock() =
-        inherit Hand(HandType.Rock)
-
-        override this.ShootVs (hand : Hand) =
-            match hand.Type with
-            | HandType.Scissors ->
-                this :> Hand
-            | HandType.Paper ->
-                hand
-            | HandType.Rock ->
-                Hand(HandType.None)
-            | HandType.Lizard ->
-                this :> Hand
-            | HandType.Spock ->
-                hand
-            | _ ->
-                base.ShootVs hand
-                
-    type Lizard() =
-        inherit Hand(HandType.Lizard)
-
-        override this.ShootVs (hand : Hand) =
-            match hand.Type with
-            | HandType.Scissors ->
-                hand
-            | HandType.Paper ->
-                this :> Hand
-            | HandType.Rock ->
-                hand
-            | HandType.Lizard ->
-                Hand(HandType.None)
-            | HandType.Spock ->
-                this :> Hand
-            | _ ->
-                base.ShootVs hand
-                
-    type Spock() =
-        inherit Hand(HandType.Spock)
-
-        override this.ShootVs (hand : Hand) =
-            match hand.Type with
-            | HandType.Scissors ->
-                this :> Hand
-            | HandType.Paper ->
-                hand
-            | HandType.Rock ->
-                this :> Hand
-            | HandType.Lizard ->
-                hand
-            | HandType.Spock ->
-                Hand(HandType.None)
-            | _ ->
-                base.ShootVs hand
-
-    let GetWinner 
-        (left : Hand)
-        (right : Hand) =
-        left.ShootVs right                

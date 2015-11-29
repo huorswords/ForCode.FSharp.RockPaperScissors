@@ -6,58 +6,34 @@ open Xunit.Extensions
 
 module RockPaperScissorsTests = 
     open ForCode.RockPaperScissors.RockPaperScissorsResolver
-
-    let TestData = [|
-           [| Scissors() :> Hand; Paper()    :> Hand; Scissors()          :> Hand |]
-           [| Paper()    :> Hand; Scissors() :> Hand; Scissors()          :> Hand |]
-           [| Scissors() :> Hand; Paper()    :> Hand; Scissors()          :> Hand |]
-           [| Scissors() :> Hand; Rock()     :> Hand; Rock()              :> Hand |]
-           [| Rock()     :> Hand; Scissors() :> Hand; Rock()              :> Hand |]
-           [| Paper()    :> Hand; Rock()     :> Hand; Paper()             :> Hand |]
-           [| Rock()     :> Hand; Paper()    :> Hand; Paper()             :> Hand |]
-           [| Paper()    :> Hand; Lizard()   :> Hand; Lizard()            :> Hand |]
-           [| Paper()    :> Hand; Spock()    :> Hand; Paper()             :> Hand |]
-           [| Scissors() :> Hand; Lizard()   :> Hand; Scissors()          :> Hand |]
-           [| Scissors() :> Hand; Spock()    :> Hand; Spock()             :> Hand |]
-           [| Rock()     :> Hand; Lizard()   :> Hand; Rock()              :> Hand |]
-           [| Rock()     :> Hand; Spock()    :> Hand; Spock()             :> Hand |]
-           [| Lizard()   :> Hand; Paper()    :> Hand; Lizard()            :> Hand |]
-           [| Spock()    :> Hand; Paper()    :> Hand; Paper()             :> Hand |]
-           [| Lizard()   :> Hand; Scissors() :> Hand; Scissors()          :> Hand |]
-           [| Spock()    :> Hand; Scissors() :> Hand; Spock()             :> Hand |]
-           [| Lizard()   :> Hand; Rock()     :> Hand; Rock()              :> Hand |]
-           [| Spock()    :> Hand; Rock()     :> Hand; Spock()             :> Hand |]
-
-           [| Scissors() :> Hand; Scissors() :> Hand; Hand(HandType.None)         |]
-           [| Rock()     :> Hand; Rock()     :> Hand; Hand(HandType.None)         |]
-           [| Paper()    :> Hand; Paper()    :> Hand; Hand(HandType.None)         |]
-           [| Lizard()   :> Hand; Lizard()   :> Hand; Hand(HandType.None)         |]
-           [| Spock()    :> Hand; Spock()    :> Hand; Hand(HandType.None)         |]
-        |] 
-
-    let WrongData = [|
-            [| Hand(HandType.None); Hand(HandType.None) |]
-            [| Hand(HandType.None); Scissors() :> Hand  |]
-            [| Scissors() :> Hand ; Hand(HandType.None) |]
-        |]
-
-    [<Theory>]
-    [<MemberData("TestData")>]
-    let WinnerIsCorrect
-        (left : Hand)
-        (right : Hand)
-        (expected : Hand) =
-        let actual = GetWinner left right
-        let expected = expected
-        Assert.Equal(expected.Type, actual.Type)
     
     [<Theory>]
-    [<MemberData("WrongData")>]
-    let AnyInvalidHandTypeRaisesException
-        (left : Hand)
-        (right : Hand) =
-        try
-            let actual = GetWinner left right
-            Assert.True(false)
-        with
-         | Failure(msg) -> printfn "%s" msg;
+    [<InlineData(HandType.Scissors   , HandType.Paper      , GameResult.Win   )>]
+    [<InlineData(HandType.Paper      , HandType.Scissors   , GameResult.Lose  )>]
+    [<InlineData(HandType.Scissors   , HandType.Rock       , GameResult.Lose  )>]
+    [<InlineData(HandType.Rock       , HandType.Scissors   , GameResult.Win   )>]
+    [<InlineData(HandType.Paper      , HandType.Rock       , GameResult.Win   )>]
+    [<InlineData(HandType.Rock       , HandType.Paper      , GameResult.Lose  )>]
+    [<InlineData(HandType.Paper      , HandType.Lizard     , GameResult.Lose  )>]
+    [<InlineData(HandType.Paper      , HandType.Spock      , GameResult.Win   )>]
+    [<InlineData(HandType.Scissors   , HandType.Lizard     , GameResult.Win   )>]
+    [<InlineData(HandType.Scissors   , HandType.Spock      , GameResult.Lose  )>]
+    [<InlineData(HandType.Rock       , HandType.Lizard     , GameResult.Win   )>]
+    [<InlineData(HandType.Rock       , HandType.Spock      , GameResult.Lose  )>]
+    [<InlineData(HandType.Lizard     , HandType.Paper      , GameResult.Win   )>]
+    [<InlineData(HandType.Spock      , HandType.Paper      , GameResult.Lose  )>]
+    [<InlineData(HandType.Lizard     , HandType.Scissors   , GameResult.Lose  )>]
+    [<InlineData(HandType.Spock      , HandType.Scissors   , GameResult.Win   )>]
+    [<InlineData(HandType.Lizard     , HandType.Rock       , GameResult.Lose  )>]
+    [<InlineData(HandType.Spock      , HandType.Rock       , GameResult.Win   )>]
+    [<InlineData(HandType.Scissors   , HandType.Scissors   , GameResult.Deuce )>]
+    [<InlineData(HandType.Rock       , HandType.Rock       , GameResult.Deuce )>]
+    [<InlineData(HandType.Paper      , HandType.Paper      , GameResult.Deuce )>]
+    [<InlineData(HandType.Lizard     , HandType.Lizard     , GameResult.Deuce )>]
+    [<InlineData(HandType.Spock      , HandType.Spock      , GameResult.Deuce )>]
+    let GameResultIsAsExpected
+        (left: HandType, right: HandType, expected: GameResult) =
+        let me = HandFactory.Create left
+        let you = HandFactory.Create right
+        let actual = me.Play you
+        Assert.Equal(expected, actual)
